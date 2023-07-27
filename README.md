@@ -1,5 +1,7 @@
 # How To Setup Complete DevOps Home Lab Using Vagrant on Ubuntu | Vagrant | Ansible | Jenkins | GitLab| Kubernetes | K3S
 
+![alt text](https://github.com/dimuit86/vagrant-ansible-devops-lab/blob/main/Vagrant-Lab.png?raw=true)
+
 ##  Home Lab Using Vagrant And Libvirt
 
 This repository contains five node ansible lab setup using vagrant and Virtual Machine Manager (Libvirt) as the provider.
