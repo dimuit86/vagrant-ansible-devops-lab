@@ -1,0 +1,12 @@
+---
+- name: Setup K3S Agent
+  hosts: k3sagent
+  become: yes
+
+  tasks:
+  - name: Adding Firewall Rules
+    shell: sudo ufw allow 6443
+
+  - name: Setting Up K3S Worker Agent-01
+    shell: |
+      curl -sfL https://get.k3s.io | K3S_URL="https://192.168.122.190:6443" K3S_TOKEN=123456789 sh -s -

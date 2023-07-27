@@ -1,0 +1,28 @@
+---
+- name: Setup K3S Master
+  hosts: k3sserver
+  become: yes
+
+  tasks:
+  - name: Adding Firewall Rules
+    shell: sudo ufw allow 6443
+
+  - name: Setting Up K3S Master
+    shell: 'curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --flannel-backend none" K3S_TOKEN=123456789 K3S_KUBECONFIG_MODE="644" sh -s - --bind-address 192.168.122.190'
+
+  - name: Setting Up KUBECONFIG
+    shell: |
+      export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+      mkdir -p ~/.kube
+      sudo k3s kubectl config view --raw | tee ~/.kube/config
+      chmod 600 ~/.kube/config
+      export KUBECONFIG=~/.kube/config
+
+  - name: Get the K3S_NODE_TOKEN
+    shell: "sudo cat /var/lib/rancher/k3s/server/node-token"
+    become: true
+    become_user: sudo
+    register: K3S_NODE_TOKEN
+
+  - debug:
+      msg: "{{ K3S_NODE_TOKEN.stdout_lines }}"

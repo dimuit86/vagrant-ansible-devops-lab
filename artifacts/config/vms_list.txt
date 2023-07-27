@@ -1,0 +1,4 @@
+gitlab.demo.com
+jenkins.demo.com
+k3sserver.demo.com
+k3sagent.demo.com

@@ -1,0 +1,55 @@
+---
+- name: Install GitLab Community Edition
+  hosts: gitlab
+  become: yes
+
+  tasks:
+  - name: Install required dependencies
+    apt:
+      name:
+        - curl
+        - openssh-server
+        - ca-certificates
+        - tzdata
+        - perl
+      state: present
+
+  - name: Add GitLab CE repository Key
+    ansible.builtin.get_url:
+      url: "https://packages.gitlab.com/gpg.key"
+      dest: "/usr/share/keyrings/gitlab-keyring.asc"
+      mode: '0644'
+      force: true
+
+  - name: Add an Apt signing key, uses whichever key is at the URL
+    shell: "curl -fsSL https://packages.gitlab.com/gpg.key | sudo tee \
+    /usr/share/keyrings/gitlab-keyring.asc > /dev/null"        
+
+  - name: Add specified repository into sources list using specified filename
+    shell: "echo deb [signed-by=/usr/share/keyrings/gitlab-keyring.asc] https://packages.gitlab.com/gitlab/gitlab-ce/ubuntu/ $(lsb_release -cs) main | sudo tee   /etc/apt/sources.list.d/gitlab.list > /dev/null"
+
+  - name: Update APT package manager repositories cache
+    apt:
+      update_cache: yes
+
+  - name: Install GitLab Community Edition
+    apt:
+      name: gitlab-ce
+      state: present
+
+  - name: Configure GitLab external URL
+    lineinfile:
+      path: /etc/gitlab/gitlab.rb
+      regexp: "^external_url"
+      line: "external_url 'http://gitlab.demo.com'"
+    notify:
+      - Reconfigure GitLab
+
+  handlers:
+    - name: Restart Postfix
+      service:
+        name: postfix
+        state: restarted
+
+    - name: Reconfigure GitLab
+      command: gitlab-ctl reconfigure

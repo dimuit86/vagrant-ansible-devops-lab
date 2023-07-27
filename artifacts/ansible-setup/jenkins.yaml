@@ -1,0 +1,57 @@
+---
+- name: Install Jenkins
+  hosts: jenkins
+  gather_facts: false
+  become: true
+
+  tasks:
+  - name: Add Jenkins apt repository key.
+    ansible.builtin.get_url:
+      url: "https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key"
+      dest: "/usr/share/keyrings/jenkins-keyring.asc"
+      mode: '0644'
+      force: true
+
+  - name: Add an Apt signing key, uses whichever key is at the URL
+    shell: "curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null"
+
+  - name: Add specified repository into sources list using specified filename
+    shell: "echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]   https://pkg.jenkins.io/debian-stable binary/ | sudo tee   /etc/apt/sources.list.d/jenkins.list > /dev/null"
+
+  - name: Update APT package manager repositories cache
+    apt:
+      update_cache: yes
+
+  - name: Install openjdk 
+    ansible.builtin.apt:
+      name: openjdk-11-jdk
+      state: present
+
+  - name: Install jenkins
+    ansible.builtin.apt:
+      name: jenkins
+      state: present
+
+  - name: Enable Jenkins service
+    ansible.builtin.service:
+      name: jenkins
+      enabled: yes
+
+  - name: Restart Jenkins service
+    ansible.builtin.service:
+      name: jenkins
+      state: restarted
+
+  - name: Sleep for 30 seconds until service comes up again
+    wait_for:
+      timeout: 30
+
+  - name: Get the Jenkins init password 
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword 
+    changed_when: false
+    register: result
+
+  - name: Print init password Jenkins
+    debug:
+      var: result.stdout
