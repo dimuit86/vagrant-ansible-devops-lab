@@ -212,8 +212,6 @@ From the Virtual Machine Manager, you can start, stop, and modify the virtual ma
 
 # Streamlining Multi-Node Deployment with Vagrant and Libvirt 
 
-![Image: Streamlining Multi-Node Deployment with Vagrant and Libvirt](https://example.com/streamlining_multinode_deployment.jpg)
-
 ## Introduction
 
 In this article, we will explore a Vagrantfile used to provision virtual machines for a multi-node environment and the associated scripts used for configuration. We will explain the essential parts of the code and how it sets up various nodes such as the controller, Jenkins, GitLab, K3S Master, and K3S Agent.
